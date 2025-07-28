@@ -1,57 +1,97 @@
-const boardEl = document.getElementById('board');
-const statusEl = document.getElementById('status');
+const board = document.getElementById("chessboard");
+const whiteScoreEl = document.getElementById("white-score");
+const blackScoreEl = document.getElementById("black-score");
 
-const game = new Chess();
+let selectedSquare = null;
+let whiteScore = 0;
+let blackScore = 0;
 
-const onDragStart = (source, piece) => {
-  if (game.game_over() || 
-     (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-     (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
-    return false;
-  }
+const pieceValues = {
+  "♟": 1, "♙": 1,
+  "♞": 3, "♘": 3,
+  "♝": 3, "♗": 3,
+  "♜": 5, "♖": 5,
+  "♛": 9, "♕": 9,
+  "♚": 0, "♔": 0
 };
 
-const onDrop = (source, target) => {
-  const move = game.move({
-    from: source,
-    to: target,
-    promotion: 'q'
-  });
+const whitePieces = ["♙", "♖", "♘", "♗", "♕", "♔"];
+const blackPieces = ["♟", "♜", "♞", "♝", "♛", "♚"];
 
-  if (move === null) return 'snapback';
-
-  updateStatus();
+const pieces = {
+  0: ["♜", "♞", "♝", "♛", "♚", "♝", "♞", "♜"],
+  1: Array(8).fill("♟"),
+  6: Array(8).fill("♙"),
+  7: ["♖", "♘", "♗", "♕", "♔", "♗", "♘", "♖"]
 };
 
-const onSnapEnd = () => {
-  board.position(game.fen());
-};
+function getSquareColor(row, col) {
+  return (row + col) % 2 === 0 ? "white" : "black";
+}
 
-const board = Chessboard('board', {
-  draggable: true,
-  position: 'start',
-  onDragStart,
-  onDrop,
-  onSnapEnd
-});
+function createBoard() {
+  board.innerHTML = ""; // Clear board
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const square = document.createElement("div");
+      square.classList.add("square", getSquareColor(row, col));
+      square.dataset.row = row;
+      square.dataset.col = col;
 
-const updateStatus = () => {
-  let status = '';
-  const moveColor = game.turn() === 'w' ? 'White' : 'Black';
+      // Add pieces if available
+      if (pieces[row]) {
+        const piece = pieces[row][col];
+        if (piece) {
+          square.textContent = piece;
+          square.classList.add("piece");
+        }
+      }
 
-  if (game.in_checkmate()) {
-    status = `Game over, ${moveColor} is in checkmate.`;
-  } else if (game.in_draw()) {
-    status = 'Game over, drawn position.';
-  } else {
-    status = `${moveColor} to move`;
-
-    if (game.in_check()) {
-      status += `, ${moveColor} is in check.`;
+      square.addEventListener("click", () => handleSquareClick(square));
+      board.appendChild(square);
     }
   }
+}
 
-  statusEl.innerHTML = status;
-};
+function updateScores() {
+  whiteScoreEl.textContent = `White: ${whiteScore}`;
+  blackScoreEl.textContent = `Black: ${blackScore}`;
+}
 
-updateStatus();
+function handleSquareClick(square) {
+  if (selectedSquare) {
+    if (square === selectedSquare) {
+      // Deselect
+      selectedSquare.classList.remove("selected");
+      selectedSquare = null;
+    } else {
+      const movingPiece = selectedSquare.textContent;
+      const targetPiece = square.textContent;
+
+      if (targetPiece) {
+        // Capture logic
+        if (whitePieces.includes(movingPiece) && blackPieces.includes(targetPiece)) {
+          whiteScore += pieceValues[targetPiece];
+        } else if (blackPieces.includes(movingPiece) && whitePieces.includes(targetPiece)) {
+          blackScore += pieceValues[targetPiece];
+        }
+        updateScores();
+      }
+
+      // Move piece
+      square.textContent = movingPiece;
+      square.classList.add("piece");
+
+      selectedSquare.textContent = "";
+      selectedSquare.classList.remove("piece", "selected");
+
+      selectedSquare = null;
+    }
+  } else if (square.textContent !== "") {
+    selectedSquare = square;
+    selectedSquare.classList.add("selected");
+  }
+}
+
+createBoard();
+updateScores();
