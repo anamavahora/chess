@@ -1,42 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chess Game</title>
-  <link rel="stylesheet" href="https://unpkg.com/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" />
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      height: 100vh;
-      margin: 0;
-      background: #1e1e2f;
-      color: #fff;
-    }
-    h1 {
-      margin-bottom: 10px;
-    }
-    #board {
-      width: 90vmin;
-      max-width: 500px;
-    }
-    #status {
-      margin-top: 10px;
-      font-size: 1rem;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Chess Game with Points</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>♟️ Chess Game</h1>
-  <div id="board"></div>
-  <div id="status"></div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.13.4/chess.min.js"></script>
-  <script src="https://unpkg.com/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+  <div id="scoreboard">
+    <div id="white-score">White: 0</div>
+    <div id="black-score">Black: 0</div>
+  </div>
+
+  <div id="chessboard"></div>
+
   <script src="script.js"></script>
 </body>
 </html>
